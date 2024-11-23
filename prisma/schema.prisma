@@ -14,8 +14,17 @@ datasource db {
 }
 
 model Intention {
-  id              String @id @default(auto()) @map("_id") @db.ObjectId
+  id              String  @id @default(auto()) @map("_id") @db.ObjectId
   origin_cep      String
   destination_cep String
-  lead            String?
+  lead            Lead?   @relation(fields: [lead_id], references: [id])
+  lead_id         String? @unique @db.ObjectId
+
+}
+
+model Lead {
+  id              String     @id @default(auto()) @map("_id") @db.ObjectId
+  name            String
+  email           String
+  intention       Intention?  
 }
