@@ -1,0 +1,181 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Smart Envios API",
+    "version": "1.0.0",
+    "description": "API para gerenciamento de intenções e leads"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Servidor local"
+    }
+  ],
+  "paths": {
+    "/intention": {
+      "post": {
+        "summary": "Cria uma intenção de cálculo de frete",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "origin_cep": {
+                    "type": "string",
+                    "example": "12345678",
+                    "description": "CEP de origem"
+                  },
+                  "destination_cep": {
+                    "type": "string",
+                    "example": "87654321",
+                    "description": "CEP de destino"
+                  }
+                },
+                "required": ["origin_cep", "destination_cep"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Intenção criada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "string" },
+                    "origin_cep": { "type": "string" },
+                    "destination_cep": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos"
+          }
+        }
+      }
+    },
+    "/intention/{id}": {
+      "put": {
+        "summary": "Atualiza uma intenção existente",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID da intenção a ser atualizada"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "origin_cep": { "type": "string", "example": "12345678" },
+                  "destination_cep": { "type": "string", "example": "87654321" },
+                  "lead_id": { "type": "string", "example": "61b7d17" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Intenção atualizada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "string" },
+                    "origin_cep": { "type": "string" },
+                    "destination_cep": { "type": "string" },
+                    "lead_id": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Intenção não encontrada"
+          }
+        }
+      }
+    },
+    "/lead": {
+      "post": {
+        "summary": "Cria um novo lead",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "João Silva",
+                    "description": "Nome do lead"
+                  },
+                  "email": {
+                    "type": "string",
+                    "example": "joao.silva@example.com",
+                    "description": "E-mail do lead"
+                  }
+                },
+                "required": ["name", "email"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Lead criado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "string" },
+                    "name": { "type": "string" },
+                    "email": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos"
+          }
+        }
+      }
+    },
+    "/docs": {
+      "get": {
+        "summary": "Obtém a documentação da API em formato JSON",
+        "responses": {
+          "200": {
+            "description": "Documentação da API",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

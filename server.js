@@ -1,14 +1,17 @@
 import express from 'express'
 import { PrismaClient } from '@prisma/client'
 import nodemailer from 'nodemailer'
-import swaggerUi from 'swagger-ui-express'
-import swaggerJsdoc from 'swagger-jsdoc'
 import { intentionSchema, leadSchema } from './schemas.js'
+import swaggerUi from 'swagger-ui-express'
+import swaggerDocs from './swagger.json' assert { type: 'json' }
 
 // Criação de variáveis para utilização de bibliotecas
 const prisma = new PrismaClient()
 const app = express()
 app.use(express.json())
+// Configurar o Swagger UI
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs)) // Exibe a interface gráfica do Swagger
+
 
 // Criação do transporter para enviar email de criação de leads
 const transporter = nodemailer.createTransport({
@@ -103,7 +106,9 @@ app.post('/lead', async (req, res, next) => {
 })
 
 // Rota /docs
-app.get('/docs', (req, res) => {})
+app.get('/docs', (req, res) => {
+    res.json(swaggerDocs)
+})
 
 // Tratamento de erro
 app.use((err, req, res, next) => {

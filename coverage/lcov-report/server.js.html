@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">83.33% </span>
+                <span class="strong">80.95% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>35/42</span>
+                <span class='fraction'>34/42</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">83.33% </span>
+                <span class="strong">80.95% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>35/42</span>
+                <span class='fraction'>34/42</span>
             </div>
         
             
@@ -187,15 +187,7 @@
 <a name='L122'></a><a href='#L122'>122</a>
 <a name='L123'></a><a href='#L123'>123</a>
 <a name='L124'></a><a href='#L124'>124</a>
-<a name='L125'></a><a href='#L125'>125</a>
-<a name='L126'></a><a href='#L126'>126</a>
-<a name='L127'></a><a href='#L127'>127</a>
-<a name='L128'></a><a href='#L128'>128</a>
-<a name='L129'></a><a href='#L129'>129</a>
-<a name='L130'></a><a href='#L130'>130</a>
-<a name='L131'></a><a href='#L131'>131</a>
-<a name='L132'></a><a href='#L132'>132</a>
-<a name='L133'></a><a href='#L133'>133</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L125'></a><a href='#L125'>125</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -207,16 +199,7 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -313,13 +296,14 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -329,29 +313,20 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import express from 'express'
 import { PrismaClient } from '@prisma/client'
-import Joi from 'joi';
 import nodemailer from 'nodemailer'
-import swaggerUi from 'swagger-ui-express';
-import swaggerJsdoc from 'swagger-jsdoc';
+import { intentionSchema, leadSchema } from './schemas.js'
+import swaggerUi from 'swagger-ui-express'
+import swaggerDocs from './swagger.json' assert { type: 'json' }
 &nbsp;
-//Criação de variáveis para utilização de bibliotecas
+// Criação de variáveis para utilização de bibliotecas
 const prisma = new PrismaClient()
 const app = express()
 app.use(express.json())
+// Configurar o Swagger UI
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs)) // Exibe a interface gráfica do Swagger
 &nbsp;
-// Validações com Joi
-const intentionSchema = Joi.object({
-    origin_cep: Joi.string().length(8).regex(/^\d+$/).required(),
-    destination_cep: Joi.string().length(8).regex(/^\d+$/).required(),
-    lead_id: Joi.string().optional(),
-});
 &nbsp;
-const leadSchema = Joi.object({
-    name: Joi.string().min(3).required(), 
-    email: Joi.string().email().required(),
-});
-&nbsp;
-//Criação do transporter para enviar email de criação de leads
+// Criação do transporter para enviar email de criação de leads
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
     port: 465,
@@ -360,13 +335,13 @@ const transporter = nodemailer.createTransport({
         user: 'testemateusprogramacao@gmail.com',
         pass: 'trni pgqm odgi sort',
     },
-});
+})
 &nbsp;
-//Método POST da rota /intention, para registrar uma intenção de cálculo de frete
+// Método POST da rota /intention
 app.post('/intention', async (req, res, next) =&gt; {
-    const { error } = intentionSchema.validate(req.body);
+    const { error } = intentionSchema.validate(req.body)
     if (error) {
-        return res.status(400).json({ error: error.details[0].message });
+        return res.status(400).json({ error: error.details[0].message })
     }
     try {
         const createdIntention = await prisma.intention.create({
@@ -374,25 +349,25 @@ app.post('/intention', async (req, res, next) =&gt; {
                 origin_cep: req.body.origin_cep,
                 destination_cep: req.body.destination_cep,
             },
-        });
-        res.status(201).json(createdIntention);
+        })
+        res.status(201).json(createdIntention)
     } catch (err) {
-<span class="cstat-no" title="statement not covered" >        next(err);</span>
+<span class="cstat-no" title="statement not covered" >        next(err)</span>
     }
-});
+})
 &nbsp;
-//Método PUT da rota /intention/:id para editar uma intention especificada pelo seu id e colocar o id do lead
+// Método PUT da rota /intention/:id
 app.put('/intention/:id', async (req, res, next) =&gt; {
-    const { error } = intentionSchema.validate(req.body);
+    const { error } = intentionSchema.validate(req.body)
     <span class="missing-if-branch" title="if path not taken" >I</span>if (error) {
-<span class="cstat-no" title="statement not covered" >        return res.status(400).json({ error: error.details[0].message });</span>
+<span class="cstat-no" title="statement not covered" >        return res.status(400).json({ error: error.details[0].message })</span>
     }
     try {
         const intention = await prisma.intention.findUnique({
             where: { id: req.params.id },
-        });
+        })
         if (!intention) {
-            return res.status(404).json({ error: 'Intention not found' });
+            return res.status(404).json({ error: 'Intention not found' })
         }
 &nbsp;
         const updatedIntention = await prisma.intention.update({
@@ -402,18 +377,18 @@ app.put('/intention/:id', async (req, res, next) =&gt; {
                 destination_cep: req.body.destination_cep,
                 lead_id: req.body.lead_id,
             },
-        });
-        res.status(200).json(updatedIntention);
+        })
+        res.status(200).json(updatedIntention)
     } catch (err) {
-<span class="cstat-no" title="statement not covered" >        next(err);</span>
+<span class="cstat-no" title="statement not covered" >        next(err)</span>
     }
-});
+})
 &nbsp;
-//Método POST da rota /lead para criar um lead
+// Método POST da rota /lead
 app.post('/lead', async (req, res, next) =&gt; {
-    const { error } = leadSchema.validate(req.body);
+    const { error } = leadSchema.validate(req.body)
     if (error) {
-        return res.status(400).json({ error: error.details[0].message });
+        return res.status(400).json({ error: error.details[0].message })
     }
     try {
         const createdLead = await prisma.lead.create({
@@ -421,9 +396,9 @@ app.post('/lead', async (req, res, next) =&gt; {
                 name: req.body.name,
                 email: req.body.email,
             },
-        });
+        })
         
-        res.status(201).json(createdLead);
+        res.status(201).json(createdLead)
 &nbsp;
         // Envio do Email
         try {
@@ -433,28 +408,29 @@ app.post('/lead', async (req, res, next) =&gt; {
                 subject: 'Obrigado por se cadastrar!',
                 html: `&lt;h1&gt;Olá, ${req.body.name}&lt;/h1&gt; &lt;p&gt;Obrigado por se cadastrar em nossa plataforma!&lt;/p&gt;`,
                 text: `Olá. ${req.body.name}, obrigado por se cadastrar em nossa plataforma!`,
-            });
+            })
         } catch (emailError) {
-<span class="cstat-no" title="statement not covered" >            console.error(`Erro ao enviar email para ${req.body.email}:`, emailError);</span>
+<span class="cstat-no" title="statement not covered" >            console.error(`Erro ao enviar email para ${req.body.email}:`, emailError)</span>
         }
 &nbsp;
     } catch (err) {
-<span class="cstat-no" title="statement not covered" >        next(err);</span>
+<span class="cstat-no" title="statement not covered" >        next(err)</span>
     }
-});
-&nbsp;
-//Rota /docs com método get para obter a documentação do swagger
-app.get('/docs', <span class="fstat-no" title="function not covered" >(r</span>eq, res) =&gt; {
-&nbsp;
 })
 &nbsp;
-// Tratamento de erro caso dê erro no servidor
-app.use(<span class="fstat-no" title="function not covered" >(e</span>rr, req, res, next) =&gt; {
-<span class="cstat-no" title="statement not covered" >    console.error(err.stack);</span>
-<span class="cstat-no" title="statement not covered" >    res.status(500).json({ error: err.message || 'Internal server error' });</span>
-});
+// Rota /docs
+app.get('/docs', <span class="fstat-no" title="function not covered" >(r</span>eq, res) =&gt; {
+<span class="cstat-no" title="statement not covered" >    res.json(swaggerDocs)</span>
+})
 &nbsp;
-export default app;
+// Tratamento de erro
+app.use(<span class="fstat-no" title="function not covered" >(e</span>rr, req, res, next) =&gt; {
+<span class="cstat-no" title="statement not covered" >    console.error(err.stack)</span>
+<span class="cstat-no" title="statement not covered" >    res.status(500).json({ error: err.message || 'Internal server error' })</span>
+})
+&nbsp;
+//Exporta o app para ser utilizado em testes com jest
+export default app
 &nbsp;
 app.listen(3000, () =&gt; {
     console.log('Servidor rodando na porta 3000')
@@ -466,7 +442,7 @@ app.listen(3000, () =&gt; {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-11-24T23:53:34.155Z
+                at 2024-11-25T01:55:11.193Z
             </div>
         <script src="prettify.js"></script>
         <script>
